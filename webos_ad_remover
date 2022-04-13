@@ -9,12 +9,10 @@ set -e
 ############ Begin User Customizable ENV Variables
 # Set WAR_ENABLED=false to disable this script.
 WAR_ENABLED=true
-# Modify WAR_USB_LOCATION to point to the mount point for your USB. If you have no other USB storage devices plugged in then leave the default setting.
-WAR_USB_LOCATION='/tmp/usb/sda/sda1'
 ############ END User Customizable ENV Variables. Advanced users only past this point.
 
 # This is the directory we will mount override files from.
-WAR_WORKDIR="$WAR_USB_LOCATION/webos_ad_removal"
+WAR_WORKDIR="/tmp/webos_ad_removal"
 
 # These are the source files that we will copy and modify.
 WAR_AI_BOARD_SOURCE="/usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/AIBoard.qml"
@@ -59,18 +57,13 @@ check_target_sums() {
     esac
 }
 
-check_for_usb() {
+check_workdir() {
     # We check to make sure the USB is mounted.
     # When you plug in a USB storage device webOS will ask you to format it (if it is not NTFS) and then it will automount.
     # This is the procedure we are using to format and mount our storage device.
     # If you have a problem then make sure your device is properly formatted or modify $WAR_USB_LOCATION
     # Note: This could be done a little better to make sure we are using the right USB storage device.
-    WAR_CHECK_USB=$(cat /proc/mounts | grep $WAR_USB_LOCATION)
-    if [ -z "$WAR_CHECK_USB" ]; then
-        echo "USB not detected."
-        exit 1
-    fi
-    echo "USB Found. Creating WAR work directory if it does not exist."
+    rm -rf $WAR_WORKDIR
     mkdir -p $WAR_WORKDIR
 }
 
@@ -128,7 +121,7 @@ init() {
     # Make sure WAR_ENABLED is not set to false
     check_war_enabled
     # This is the entrypoint for the script.
-    check_for_usb
+    check_workdir
     # Optional. This removes the AI Board (Top bar with 3 boxes. Includes ad, hero banner)
     remove_ai_board
     # Optional. This removes the trending section
