@@ -9,6 +9,8 @@ set -e
 ############ Begin User Customizable ENV Variables
 # Set WAR_ENABLED=false to disable this script.
 WAR_ENABLED=true
+AI_BOARD=true
+RECOMMENDED=true
 ############ END User Customizable ENV Variables. Advanced users only past this point.
 
 # This is the directory we will mount override files from.
@@ -32,7 +34,7 @@ check_install() {
         echo "WAR script is not installed. Installing."
         curl -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover > /var/lib/webosbrew/init.d/webos_ad_remover
     else
-        echo "WAR script installed."
+        echo "WAR script installed, exiting."
         exit 1
     fi
 }
@@ -88,13 +90,14 @@ create_ai_board_override() {
 
 remove_ai_board() {
     # First we check if the AIBoard.qml file exists on the USB. If it does not we create it.
-    if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
-        echo "AIBoard override file did not exist on USB. Creating one now."
-        create_ai_board_override
-    else
-        echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
+    if [ $AI_BOARD = true ]; then
+        if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
+            echo "AIBoard override file did not exist on USB. Creating one now."
+            create_ai_board_override
+        else
+            echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
+        fi
     fi
-
     # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
     mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
 }
@@ -113,11 +116,13 @@ create_recommended_override() {
 
 remove_recommended() {
     # First we check if the Recommended.qml file exists on the USB.
-    if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
-        echo "Recommended override file did not exist on USB. Creating one now."
-        create_recommended_override
-    else
-        echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
+    if [ $RECOMMENDED = true ]; then
+        if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
+            echo "Recommended override file did not exist on USB. Creating one now."
+            create_recommended_override
+        else
+            echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
+        fi
     fi
 
     # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
