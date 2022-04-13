@@ -26,6 +26,17 @@ check_war_enabled() {
     fi
 }
 
+check_install() {
+    # Check if installed. If not install.
+    if [ ! -f "/var/lib/webosbrew/init.d/webos_ad_remover" ]; then
+        echo "WAR script is not installed. Installing."
+        curl -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover > /var/lib/webosbrew/init.d/webos_ad_remover
+    else
+        echo "WAR script installed."
+        exit 1
+    fi
+}
+
 check_target_sums() {
     # We check sha512 sum of target files before proceeding. We will be inserting a line of code at a specific line, we do this to ensure
     # there are no unexpected results. Old versions of WebOS or updates may cause files to change, which will break this script.
@@ -116,6 +127,8 @@ remove_recommended() {
 init() {
     # Make sure WAR_ENABLED is not set to false
     check_war_enabled
+    # Check install
+    check_install
     # This is the entrypoint for the script.
     check_workdir
     # Optional. This removes the AI Board (Top bar with 3 boxes. Includes ad, hero banner)
