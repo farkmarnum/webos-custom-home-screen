@@ -58,11 +58,7 @@ check_target_sums() {
 }
 
 check_workdir() {
-    # We check to make sure the USB is mounted.
-    # When you plug in a USB storage device webOS will ask you to format it (if it is not NTFS) and then it will automount.
-    # This is the procedure we are using to format and mount our storage device.
-    # If you have a problem then make sure your device is properly formatted or modify $WAR_USB_LOCATION
-    # Note: This could be done a little better to make sure we are using the right USB storage device.
+    # Del workimg directory and recreate it every script run.
     rm -rf $WAR_WORKDIR
     mkdir -p $WAR_WORKDIR
 }
