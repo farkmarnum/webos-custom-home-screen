@@ -17,7 +17,8 @@ Let me know if it works on your device.
 1. You must root your TV following the instructions provided: https://github.com/RootMyTV/RootMyTV.github.io
 2. Setup SSH access using instructions provided by the rootmytv project. I recommend setting up SSH key access.
 3. connect to tv by SSH and run command below:
-```curl -L https://raw.githubusercontent.com/webosbrew/webos-homebrew-channel/main/tools/install.sh | sh -```
+```
+curl -L https://raw.githubusercontent.com/webosbrew/webos-homebrew-channel/main/tools/install.sh | sh -```
 
 
 ## Further Notes
