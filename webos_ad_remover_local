@@ -32,7 +32,7 @@ check_install() {
     # Check if installed. If not install.
     if [ ! -f "/var/lib/webosbrew/init.d/webos_ad_remover" ]; then
         echo "WAR script is not installed. Installing."
-        curl -s -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover_local1 > /var/lib/webosbrew/init.d/webos_ad_remover
+        curl -s -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover_local > /var/lib/webosbrew/init.d/webos_ad_remover
     else
         echo "WAR script installed, exiting."
         exit 1
@@ -72,7 +72,7 @@ check_target_sums() {
             echo "Checksum matched!"
             create_recommended_override
         else
-            echo "Already patched!"        
+            echo "Already patched! Do nothing."        
         fi
         ;;
     *)
@@ -92,6 +92,7 @@ check_workdir() {
 create_ai_board_override() {
     # This runs if the modified file is not found.
     # Then we copy the AIBoard.qml file to our workdir.
+    echo "AIBoard override file did not exist. Creating one now."
     cp $WAR_AI_BOARD_SOURCE "$WAR_WORKDIR/AIBoard.qml"
 
     # Finally we modify the file.
@@ -101,17 +102,20 @@ create_ai_board_override() {
 remove_ai_board() {
     # First we check if the AIBoard.qml file exists on the USB. If it does not we create it.
     if [ $AI_BOARD_ENABLED = true ]; then
+        check_target_sums "ai_board"
         ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+        # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
+        mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
+        
         if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
             echo "AIBoard override file did not exist. Creating one now."
             check_target_sums "ai_board"
         else
             echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
         fi
-        # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
-        mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
+
     else
-        umount "$WAR_AI_BOARD_SOURCE"
+        ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
     fi
 }
 
@@ -137,7 +141,7 @@ remove_recommended() {
         # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
         mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
     else
-        umount "$WAR_RECOMMENDED_SOURCE"
+        ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
     fi
 
 
