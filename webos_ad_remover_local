@@ -24,6 +24,7 @@ check_war_enabled() {
     # This can be used to disable the script while keeping it in place. Set WAR_ENABLED to false in the env variables above.
     if [ $WAR_ENABLED = false ]; then
         echo "WAR_ENABLED set to false, exiting."
+        rm -fr $WAR_WORKDIR
         exit 1
     fi
 }
@@ -99,7 +100,9 @@ remove_ai_board() {
         # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
         mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
     else
+        echo "AIBoard block disabled. Reverting changes"
         ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+        rm -fr $WAR_WORKDIR/AIBoard.qml
     fi
 }
 
@@ -126,7 +129,9 @@ remove_recommended() {
         # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
         mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
     else
+        echo "Recommended block disabled. Reverting changes"
         ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
+        rm -fr $WAR_WORKDIR/Recommended.qml
     fi
 
 
