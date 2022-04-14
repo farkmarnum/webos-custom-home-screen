@@ -118,7 +118,7 @@ remove_recommended() {
     # First we check if the Recommended.qml file exists on the USB.
     if [ $RECOMMENDED_ENABLED = true ]; then
         if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
-            echo "Recommended override file did not exist on USB. Creating one now."
+            echo "Recommended override file did not exist. Creating one now."
             create_recommended_override
         else
             echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
