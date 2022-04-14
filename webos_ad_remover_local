@@ -105,15 +105,7 @@ remove_ai_board() {
     if [ $AI_BOARD_ENABLED = true ]; then
         check_target_sums "ai_board"
         # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
-       mountpoint -q "$WAR_AI_BOARD_SOURCE" || mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
-        
-        if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
-            echo "AIBoard override file did not exist. Creating one now."
-            check_target_sums "ai_board"
-        else
-            echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
-        fi
-
+        mountpoint -q "$WAR_AI_BOARD_SOURCE" || mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
     else
         ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
     fi
@@ -132,14 +124,10 @@ create_recommended_override() {
 remove_recommended() {
     # First we check if the Recommended.qml file exists on the USB.
     if [ $RECOMMENDED_ENABLED = true ]; then
-        if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
-            echo "Recommended override file did not exist on USB. Creating one now."
-            check_target_sums "recommended"
-        else
-            echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
-        fi
+        echo "Recommended override file did not exist on USB. Creating one now."
+        check_target_sums "recommended"
         # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
-        mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
+        mountpoint -q "$WAR_RECOMMENDED_SOURCE" || mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
     else
         ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
     fi
