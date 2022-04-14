@@ -34,7 +34,6 @@ check_install() {
     if [ ! -f "/var/lib/webosbrew/init.d/webos_ad_remover" ]; then
         echo "WAR script is not installed. Installing."
         curl -s -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover_local > /var/lib/webosbrew/init.d/webos_ad_remover
-        
     else
     script_name1=`basename $0`
     script_path1=`dirname $0`
@@ -43,6 +42,7 @@ check_install() {
             echo "WAR script installed, executing."
         else
             /var/lib/webosbrew/init.d/webos_ad_remover
+            exit 1
         fi
     fi
 }
