@@ -41,6 +41,7 @@ check_install() {
         if [ "$script_path_with_name" = "/var/lib/webosbrew/init.d/webos_ad_remover" ]; then
             echo "WAR script installed, executing."
         else
+            echo "Runnning WAR script from right location."
             /var/lib/webosbrew/init.d/webos_ad_remover
             exit 1
         fi
