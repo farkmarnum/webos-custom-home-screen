@@ -42,8 +42,7 @@ check_install() {
             echo "WAR script installed, executing."
         else
             echo "Runnning WAR script from right location."
-            sh /var/lib/webosbrew/init.d/webos_ad_remover
-            exit 1
+            /var/lib/webosbrew/init.d/webos_ad_remover
         fi
     fi
 }
