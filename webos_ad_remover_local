@@ -36,7 +36,7 @@ check_install() {
     else
         runpath=`dirname $0`/`basename $0`
         echo "$runpath"
-        if [$runpath = /var/lib/webosbrew/init.d/webos_ad_remover]; then
+        if [ $runpath = "/var/lib/webosbrew/init.d/webos_ad_remover" ; then
             echo "WAR script installed, executing."
         fi
     fi
