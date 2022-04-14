@@ -88,7 +88,8 @@ check_workdir() {
 }
 
 create_ai_board_override() {
-    ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+    #! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+    umount "$WAR_AI_BOARD_SOURCE" > /dev/null 2>&1 || :
     check_target_sums "ai_board"
     # This runs if the modified file is not found.
     # Then we copy the AIBoard.qml file to our workdir.
@@ -111,13 +112,15 @@ remove_ai_board() {
         mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
     else
         echo "AIBoard block disabled. Reverting changes"
-        ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+        #! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+        umount "$WAR_AI_BOARD_SOURCE" > /dev/null 2>&1 || :
         rm -fr $WAR_WORKDIR/AIBoard.qml
     fi
 }
 
 create_recommended_override() {
-    ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
+    #! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
+    umount "$WAR_RECOMMENDED_SOURCE" > /dev/null 2>&1 || :
     check_target_sums "recommended"
     # This runs if the modified file is not found.
     # Then we copy the Recommended.qml file to our workdir.
@@ -140,7 +143,8 @@ remove_recommended() {
         mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
     else
         echo "Recommended block disabled. Reverting changes"
-        ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
+        #! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
+        umount "$WAR_RECOMMENDED_SOURCE" > /dev/null 2>&1 || :
         rm -fr $WAR_WORKDIR/Recommended.qml
     fi
 
