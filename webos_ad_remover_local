@@ -32,7 +32,7 @@ check_install() {
     # Check if installed. If not install.
     if [ ! -f "/var/lib/webosbrew/init.d/webos_ad_remover" ]; then
         echo "WAR script is not installed. Installing."
-        curl -s -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover > /var/lib/webosbrew/init.d/webos_ad_remover
+        curl -s -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover_local > /var/lib/webosbrew/init.d/webos_ad_remover
     else
         echo "WAR script installed, exiting."
         exit 1
@@ -45,23 +45,33 @@ check_target_sums() {
     case $1 in
     "ai_board")
         WAR_AI_BOARD_SUM="986fb371dd6a8edf5a5fa8479076011c2ad0375533c8aed997cf2d50254737d34b524732d745eafff5294c37bbf5b16d57c5f03b88d547d81eb0c18beb9d01e5  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/AIBoard.qml"
+        WAR_AI_BOARD_SUM2="5e3967e9293415514c89f15a31e8cd2de6b864c6165cd322943c746d5472556dc477b4cfd85fd1eb330607905529a3e6e85f3fee2724147478273a816927beaf  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/AIBoard.qml"
         WAR_AI_BOARD_CHECK=$(sha512sum $WAR_AI_BOARD_SOURCE)
 
-        if [ "$WAR_AI_BOARD_SUM" != "$WAR_AI_BOARD_CHECK" ]; then
-            echo "Shasum did not match for AIBoard.qml! Script will not proceed!"
-            exit 1
+        if [ "$WAR_AI_BOARD_SUM2" != "$WAR_AI_BOARD_CHECK" ]; then
+            if [ "$WAR_AI_BOARD_SUM" != "$WAR_AI_BOARD_CHECK" ]; then
+                echo "Shasum did not match for AIBoard.qml! Script will not proceed!"
+                exit 1
+            fi
+            echo "Checksum matched!"
+            create_ai_board_override            
         fi
-        echo "Checksum matched!"
+        echo "Already patched!"
         ;;
     "recommended")
         WAR_RECOMMENDED_SUM="1f41b67dc3603908c3aece24c9eae6798684f92cbc89ebd4594e0d786a90dddd9aa0c1c84b9a6142f07deb955dbbd5afbe1c6fef6ca29618267caa0920872e16  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/Recommended.qml"
+        WAR_RECOMMENDED_SUM2="ea114c4312e3ebd22871cdd9e76e975163c96a6b84294efcd6d8d4691fea0e74a62a65de96c8e3e1b744903471054464776bdd23c68d004cbf82a05ad369af2d  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/Recommended.qml"
         WAR_RECOMMENDED_CHECK=$(sha512sum $WAR_RECOMMENDED_SOURCE)
 
-        if [ "$WAR_RECOMMENDED_SUM" != "$WAR_RECOMMENDED_CHECK" ]; then
-            echo "Shasum did not match for Recommended.qml! Script will not proceed!"
-            exit 1
+        if [ "$WAR_RECOMMENDED_SUM2" != "$WAR_RECOMMENDED_CHECK" ]; then
+            if [ "$WAR_RECOMMENDED_SUM" != "$WAR_RECOMMENDED_CHECK" ]; then
+                echo "Shasum did not match for Recommended.qml! Script will not proceed!"
+                exit 1
+            fi
+            echo "Checksum matched!"
+            create_recommended_override
         fi
-        echo "Checksum matched!"
+        echo "Already patched!"
         ;;
     *)
         echo "Attempted to check sum with unrecognized argument! Exiting."
@@ -79,9 +89,6 @@ check_workdir() {
 
 create_ai_board_override() {
     # This runs if the modified file is not found.
-    # First we do a checksum.
-    check_target_sums "ai_board"
-
     # Then we copy the AIBoard.qml file to our workdir.
     cp $WAR_AI_BOARD_SOURCE "$WAR_WORKDIR/AIBoard.qml"
 
@@ -94,8 +101,8 @@ remove_ai_board() {
     if [ $AI_BOARD_ENABLED = true ]; then
         ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
         if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
-            echo "AIBoard override file did not exist on USB. Creating one now."
-            create_ai_board_override
+            echo "AIBoard override file did not exist. Creating one now."
+            check_target_sums "ai_board"
         else
             echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
         fi
@@ -108,9 +115,6 @@ remove_ai_board() {
 
 create_recommended_override() {
     # This runs if the modified file is not found.
-    # First we do a checksum.
-    check_target_sums "recommended"
-
     # Then we copy the Recommended.qml file to our workdir.
     cp $WAR_AI_BOARD_SOURCE "$WAR_WORKDIR/Recommended.qml"
 
@@ -124,7 +128,7 @@ remove_recommended() {
         ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
         if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
             echo "Recommended override file did not exist on USB. Creating one now."
-            create_recommended_override
+            check_target_sums "recommended"
         else
             echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
         fi
