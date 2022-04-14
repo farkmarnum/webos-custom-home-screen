@@ -34,8 +34,7 @@ check_install() {
         echo "WAR script is not installed. Installing."
         curl -s -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover_local1 > /var/lib/webosbrew/init.d/webos_ad_remover
     else
-        echo "WAR script installed, exiting."
-        exit 1
+        echo "WAR script installed, executing."
     fi
 }
 
@@ -52,7 +51,6 @@ check_target_sums() {
             exit 1
         fi
             echo "Checksum matched!"
-            create_ai_board_override
         ;;
     "recommended")
         WAR_RECOMMENDED_SUM="1f41b67dc3603908c3aece24c9eae6798684f92cbc89ebd4594e0d786a90dddd9aa0c1c84b9a6142f07deb955dbbd5afbe1c6fef6ca29618267caa0920872e16  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/Recommended.qml"
@@ -63,29 +61,7 @@ check_target_sums() {
                 exit 1
             fi
             echo "Checksum matched!"
-            create_recommended_override
         ;;
-    "ai_board2")
-        WAR_AI_BOARD_SUM2="5e3967e9293415514c89f15a31e8cd2de6b864c6165cd322943c746d5472556dc477b4cfd85fd1eb330607905529a3e6e85f3fee2724147478273a816927beaf  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/AIBoard.qml"
-        WAR_AI_BOARD_CHECK2=$(sha512sum $WAR_AI_BOARD_SOURCE)
-
-        if [ "$WAR_AI_BOARD_SUM2" != "$WAR_AI_BOARD_CHECK2" ]; then
-            create_ai_board_override
-        else
-            echo "Already patched!"
-        fi
-        ;;
-    "recommended2")
-        WAR_RECOMMENDED_SUM2="ea114c4312e3ebd22871cdd9e76e975163c96a6b84294efcd6d8d4691fea0e74a62a65de96c8e3e1b744903471054464776bdd23c68d004cbf82a05ad369af2d  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/Recommended.qml"
-        WAR_RECOMMENDED_CHECK=$(sha512sum $WAR_RECOMMENDED_SOURCE)
-
-        if [ "$WAR_RECOMMENDED_SUM2" != "$WAR_RECOMMENDED_CHECK" ]; then
-            create_recommended_override
-        else
-            echo "Already patched!"        
-        fi
-        ;;
-    
     *)
         echo "Attempted to check sum with unrecognized argument! Exiting."
         exit 1
@@ -101,6 +77,8 @@ check_workdir() {
 }
 
 create_ai_board_override() {
+    ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
+    check_target_sums "ai_board"
     # This runs if the modified file is not found.
     # Then we copy the AIBoard.qml file to our workdir.
     cp $WAR_AI_BOARD_SOURCE "$WAR_WORKDIR/AIBoard.qml"
@@ -112,21 +90,22 @@ create_ai_board_override() {
 remove_ai_board() {
     # First we check if the AIBoard.qml file exists on the USB. If it does not we create it.
     if [ $AI_BOARD_ENABLED = true ]; then
-        ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
         if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
             echo "AIBoard override file did not exist. Creating one now."
-            check_target_sums "ai_board"
+            create_ai_board_override
         else
             echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
         fi
         # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
         mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
     else
-        umount "$WAR_AI_BOARD_SOURCE"
+        ! mountpoint -q "$WAR_AI_BOARD_SOURCE" || umount "$WAR_AI_BOARD_SOURCE"
     fi
 }
 
 create_recommended_override() {
+    ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
+    check_target_sums "recommended"
     # This runs if the modified file is not found.
     # Then we copy the Recommended.qml file to our workdir.
     cp $WAR_AI_BOARD_SOURCE "$WAR_WORKDIR/Recommended.qml"
@@ -138,17 +117,16 @@ create_recommended_override() {
 remove_recommended() {
     # First we check if the Recommended.qml file exists on the USB.
     if [ $RECOMMENDED_ENABLED = true ]; then
-        ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
         if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
             echo "Recommended override file did not exist on USB. Creating one now."
-            check_target_sums "recommended"
+            create_recommended_override
         else
             echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
         fi
         # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
         mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
     else
-        umount "$WAR_RECOMMENDED_SOURCE"
+        ! mountpoint -q "$WAR_RECOMMENDED_SOURCE" || umount "$WAR_RECOMMENDED_SOURCE"
     fi
 
 
