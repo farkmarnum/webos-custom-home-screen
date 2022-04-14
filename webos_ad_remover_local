@@ -54,9 +54,10 @@ check_target_sums() {
                 exit 1
             fi
             echo "Checksum matched!"
-            create_ai_board_override            
+            create_ai_board_override
+        else
+            echo "Already patched!"
         fi
-        echo "Already patched!"
         ;;
     "recommended")
         WAR_RECOMMENDED_SUM="1f41b67dc3603908c3aece24c9eae6798684f92cbc89ebd4594e0d786a90dddd9aa0c1c84b9a6142f07deb955dbbd5afbe1c6fef6ca29618267caa0920872e16  /usr/palm/applications/com.webos.app.home/qml/UserInterfaceLayer/Containers/Main/Recommended.qml"
@@ -70,8 +71,9 @@ check_target_sums() {
             fi
             echo "Checksum matched!"
             create_recommended_override
+        else
+            echo "Already patched!"        
         fi
-        echo "Already patched!"
         ;;
     *)
         echo "Attempted to check sum with unrecognized argument! Exiting."
