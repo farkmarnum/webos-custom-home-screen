@@ -72,8 +72,9 @@ check_target_sums() {
 
 check_workdir() {
     # Del workimg directory and recreate it every script run.
-    rm -rf $WAR_WORKDIR
-    mkdir -p $WAR_WORKDIR
+    if [ ! -d "$WAR_WORKDIR"]; then
+        mkdir -p $WAR_WORKDIR
+    fi
 }
 
 create_ai_board_override() {
@@ -91,15 +92,18 @@ create_ai_board_override() {
 remove_ai_board() {
     # First we check if the AIBoard.qml file exists on the USB. If it does not we create it.
     if [ $AI_BOARD = true ]; then
+        umount "$WAR_AI_BOARD_SOURCE"
         if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
             echo "AIBoard override file did not exist on USB. Creating one now."
             create_ai_board_override
         else
             echo "AIBoard override file found at $WAR_WORKDIR/AIBoard.qml"
         fi
+        # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
+        mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
+    else
+        umount "$WAR_AI_BOARD_SOURCE"
     fi
-    # Then we mount --bind the AIBoard.qml override file. This is a non destructive action that can be reset with a reboot or umount.
-    mount --bind "$WAR_WORKDIR/AIBoard.qml" "$WAR_AI_BOARD_SOURCE"
 }
 
 create_recommended_override() {
@@ -117,16 +121,20 @@ create_recommended_override() {
 remove_recommended() {
     # First we check if the Recommended.qml file exists on the USB.
     if [ $RECOMMENDED = true ]; then
+        umount "$WAR_RECOMMENDED_SOURCE"
         if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
             echo "Recommended override file did not exist on USB. Creating one now."
             create_recommended_override
         else
             echo "Recommended override file found at $WAR_WORKDIR/Recommended.qml"
         fi
+        # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
+        mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
+    else
+        umount "$WAR_RECOMMENDED_SOURCE"
     fi
 
-    # Then we mount --bind the Recommended.qml override file. This is a non destructive action that can be reset with a reboot or umount.
-    mount --bind "$WAR_WORKDIR/Recommended.qml" "$WAR_RECOMMENDED_SOURCE"
+
 }
 
 init() {
@@ -145,3 +153,4 @@ init() {
 }
 
 init
+c
