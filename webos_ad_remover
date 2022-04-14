@@ -9,8 +9,8 @@ set -e
 ############ Begin User Customizable ENV Variables
 # Set WAR_ENABLED=false to disable this script.
 WAR_ENABLED=true
-AI_BOARD=true
-RECOMMENDED=true
+AI_BOARD_ENABLED=true
+RECOMMENDED_ENABLED=true
 ############ END User Customizable ENV Variables. Advanced users only past this point.
 
 # This is the directory we will mount override files from.
@@ -91,7 +91,7 @@ create_ai_board_override() {
 
 remove_ai_board() {
     # First we check if the AIBoard.qml file exists on the USB. If it does not we create it.
-    if [ $AI_BOARD = true ]; then
+    if [ $AI_BOARD_ENABLED = true ]; then
         umount "$WAR_AI_BOARD_SOURCE"
         if [ ! -f "$WAR_WORKDIR/AIBoard.qml" ]; then
             echo "AIBoard override file did not exist on USB. Creating one now."
@@ -120,7 +120,7 @@ create_recommended_override() {
 
 remove_recommended() {
     # First we check if the Recommended.qml file exists on the USB.
-    if [ $RECOMMENDED = true ]; then
+    if [ $RECOMMENDED_ENABLED = true ]; then
         umount "$WAR_RECOMMENDED_SOURCE"
         if [ ! -f "$WAR_WORKDIR/Recommended.qml" ]; then
             echo "Recommended override file did not exist on USB. Creating one now."
