@@ -139,22 +139,16 @@ remove_recommended() {
 
 init() {
     # Make sure WAR_ENABLED is not set to false
-    echo "1"
     check_war_enabled
     # Check install
-    echo "2"
     check_install
     # This is the entrypoint for the script.
-    echo "3"
     check_workdir
     # Optional. This removes the AI Board (Top bar with 3 boxes. Includes ad, hero banner)
-    echo "4"
     remove_ai_board
     # Optional. This removes the trending section
-    echo "5"
     remove_recommended
     # When we are done we kill webOS home. This forces it to restart and use our changes.
-    echo "6"
     pkill -f com.webos.app.home
 }
 
