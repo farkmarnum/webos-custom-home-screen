@@ -124,7 +124,7 @@ create_recommended_override() {
     check_target_sums "recommended"
     # This runs if the modified file is not found.
     # Then we copy the Recommended.qml file to our workdir.
-    cp $WAR_AI_BOARD_SOURCE "$WAR_WORKDIR/Recommended.qml"
+    cp $WAR_RECOMMENDED_SOURCE "$WAR_WORKDIR/Recommended.qml"
 
     # Finally we modify the file.
     sed -i '17 i return' "$WAR_WORKDIR/Recommended.qml"
@@ -152,6 +152,7 @@ remove_recommended() {
 }
 
 init() {
+    pkill -f com.webos.app.home
     # Make sure WAR_ENABLED is not set to false
     check_war_enabled
     # Check install
