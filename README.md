@@ -18,7 +18,7 @@ Let me know if it works on your device.
 2. Setup SSH access using instructions provided by the rootmytv project. I recommend setting up SSH key access.
 3. connect to tv by SSH and run command below:
 ```
-curl -L https://github.com/nnmdd/war-webos-ad-remover_local/raw/main/webos_ad_remover | sh -
+curl -L https://raw.githubusercontent.com/nnmdd/war-webos-ad-remover_local/main/webos_ad_remover_local | sh -
 ```
 
 
